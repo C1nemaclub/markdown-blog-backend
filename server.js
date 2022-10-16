@@ -11,7 +11,7 @@ const bodyParser = require('body-parser');
 const { errorHandler } = require('./middleware/errorHandler');
 const { logMethod } = require('./middleware/logMethod');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 6000;
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: false }));
 app.use(express.urlencoded({ extended: false }));
@@ -36,6 +36,6 @@ const db = mongoose.connection;
 db.on('error', (err) => console.log(err));
 db.on('open', () => console.log('Connected to Mongoose'));
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
