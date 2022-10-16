@@ -20,7 +20,15 @@ app.use(cors());
 app.use(errorHandler);
 app.use(logMethod);
 
+app.get('/', (req, res) => {
+  res.send('home').reditect('/');
+});
+
 app.use('/articles', ArticleRouter);
+
+app.get('/*', (req, res) => {
+  res.status(404).redirect('/');
+});
 if (process.env.NODE_ENV === 'production') {
   console.log('joined production');
 
