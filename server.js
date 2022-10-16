@@ -20,12 +20,10 @@ app.use(cors());
 app.use(errorHandler);
 app.use(logMethod);
 
-app.get('/', (req, res) => {
-  res.send('Home');
-});
-
 app.use('/articles', ArticleRouter);
 if (process.env.NODE_ENV === 'production') {
+  console.log('joined production');
+
   app.use(express.static(path.join(__dirname, '/public')));
 } else {
   app.get('/', (req, res) => {
