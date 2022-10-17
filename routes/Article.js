@@ -3,15 +3,12 @@ const router = express.Router();
 const Article = require('../models/ArticlesModel');
 const { adminProtected } = require('../middleware/adminProtected');
 
-router.get('/x', async (req, res) => {
-  let query = Article.find().sort({ createdAt: -1 });
-  if (req.query.title != null && req.query.title != '') {
-    query = query.regex('title', new RegExp(req.query.title, 'i'));
-  }
-
+router.get('/searchId/:id', async (req, res) => {
   try {
-    const articles = await query.exec();
-    res.status(200).json(articles);
+    const { id } = req.params;
+    const article = await Article.findById(id);
+    if (!article) return;
+    res.status(200).json(article);
   } catch (e) {
     res.status(400).json({
       message: e.message,
