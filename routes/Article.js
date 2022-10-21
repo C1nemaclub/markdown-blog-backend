@@ -72,6 +72,12 @@ router.post('/new', adminProtected, async (req, res) => {
       message: 'Please fill all the fields',
     });
   }
+  const currentDate = new Date();
+  const month = currentDate.toLocaleString('default', { month: 'long' });
+  const isoDate = currentDate.toISOString().substring(0, 10);
+  const day = isoDate.split('-')[2];
+  const year = isoDate.split('-')[0];
+  const date = `${month} ${day}, ${year}`;
 
   try {
     const article = new Article({
@@ -80,6 +86,7 @@ router.post('/new', adminProtected, async (req, res) => {
       tags: tags,
       description: description,
       language: language,
+      date: date,
     });
     await article.save();
     res.status(200).json(article);
