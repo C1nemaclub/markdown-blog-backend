@@ -2,6 +2,17 @@ const express = require('express');
 const router = express.Router();
 const Article = require('../models/ArticlesModel');
 const { adminProtected } = require('../middleware/adminProtected');
+const multer = require('multer');
+const memoStorage = multer.memoryStorage();
+const upload = multer({ memoStorage });
+const storage = require('../config/firebase.js');
+const {
+  ref,
+  uploadBytes,
+  listAll,
+  deleteObject,
+  uploadBytesResumable,
+} = require('firebase/storage');
 
 router.get('/searchId/:id', async (req, res) => {
   try {
@@ -64,10 +75,17 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/new', adminProtected, async (req, res) => {
+router.post('/new', adminProtected, upload.single('file'), async (req, res) => {
   const { title, markdown, tags, description, language } = req.body;
+  const file = req.file;
+  imageRef = ref(storage, title + language + file.originalname);
+  const fileNameRef = title + language + file.originalname;
+  const metadata = {
+    contentType: 'image/jpeg',
+    contentType: 'image/png',
+  };
 
-  if (!title || !markdown || !tags || !description) {
+  if (!title || !markdown || !tags || !description || !file) {
     res.status(400).json({
       message: 'Please fill all the fields',
     });
@@ -87,9 +105,14 @@ router.post('/new', adminProtected, async (req, res) => {
       description: description,
       language: language,
       date: date,
+      imageRef: fileNameRef,
     });
     await article.save();
-    res.status(200).json(article);
+    await uploadBytesResumable(imageRef, file.buffer, metadata)
+      .then((snapshot) => {
+        res.status(200).json(article);
+      })
+      .catch((error) => console.log(error.message));
   } catch (e) {
     res.status(400).json({
       message: e.message,
@@ -114,6 +137,7 @@ router.delete('/delete/:id', adminProtected, async (req, res) => {
         article,
         message: `Succesfully deleted article ${articleId}`,
       });
+      
     } else {
       res.status(400).json({
         message: `Article ${articleId} was not found`,
