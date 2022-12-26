@@ -10,6 +10,10 @@ const articleSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    imageRef: {
+      type: String,
+      required: true,
+    },
     date: {
       type: String,
     },
